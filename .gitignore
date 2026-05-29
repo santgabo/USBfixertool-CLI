@@ -6,3 +6,7 @@ bin/
 coverage.out
 dist/
 
+# Skill packaging and local eval runs
+*.skill
+*-workspace/
+
