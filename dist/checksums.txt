@@ -1,0 +1,2 @@
+09494f2f21464ee5f578672e6b270796dc661c6395b0a22131f71f4c0fb877e4  usbfix_0.1.0_darwin_arm64.tar.gz
+215e0b440d8f59787ceb7e7ec2cf3f5275209ff17aec075b2c3acf2f73eefd4b  usbfix_0.1.0_darwin_amd64.tar.gz
