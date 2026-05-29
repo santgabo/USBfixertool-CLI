@@ -35,6 +35,7 @@ type DiskEntry struct {
 	DevicePath     string        `json:"devicePath"`
 	Size           string        `json:"size,omitempty"`
 	Name           string        `json:"name,omitempty"`
+	VolumeLabel    string        `json:"volumeLabel,omitempty"`
 	DeviceLocation string        `json:"deviceLocation,omitempty"`
 	Whole          bool          `json:"whole"`
 	Internal       bool          `json:"internal"`
@@ -90,6 +91,7 @@ func (d *Diskutil) List(ctx context.Context) ([]DiskEntry, error) {
 	}
 	disks := ParseDiskutilList(string(out))
 	for i := range disks {
+		disks[i].VolumeLabel = joinVolumeLabels(disks[i].Volumes)
 		info, err := d.Info(ctx, disks[i].Identifier)
 		if err != nil {
 			continue
@@ -102,6 +104,17 @@ func (d *Diskutil) List(ctx context.Context) ([]DiskEntry, error) {
 		disks[i].Removable = info.Removable
 	}
 	return disks, nil
+}
+
+func joinVolumeLabels(volumes []VolumeEntry) string {
+	names := make([]string, 0, len(volumes))
+	for _, volume := range volumes {
+		name := strings.TrimSpace(volume.Name)
+		if name != "" {
+			names = append(names, name)
+		}
+	}
+	return strings.Join(names, ", ")
 }
 
 func (d *Diskutil) VerifyDisk(ctx context.Context, disk string) ([]byte, error) {

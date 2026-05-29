@@ -59,6 +59,9 @@ func TestParseDiskutilList(t *testing.T) {
 	if len(disks[0].Volumes) != 1 || disks[0].Volumes[0].Identifier != "disk4s1" {
 		t.Fatalf("volumes = %#v, want disk4s1", disks[0].Volumes)
 	}
+	if got := disks[0].Volumes[0].Name; got != "USBBOOT" {
+		t.Fatalf("volume name = %q, want USBBOOT", got)
+	}
 }
 
 func TestParseDiskutilInfoMountedNotApplicableIsFalse(t *testing.T) {
@@ -99,5 +102,46 @@ func TestParseDiskutilListKeepsVolumeNamesWithSpaces(t *testing.T) {
 	}
 	if got := disks[0].Volumes[1].Size; got != "63.7 GB" {
 		t.Fatalf("volume size = %q, want 63.7 GB", got)
+	}
+}
+
+func TestJoinVolumeLabels(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		volumes []VolumeEntry
+		want    string
+	}{
+		{
+			name: "single volume",
+			volumes: []VolumeEntry{
+				{Identifier: "disk4s1", Name: "USBBOOT"},
+			},
+			want: "USBBOOT",
+		},
+		{
+			name: "multiple volumes",
+			volumes: []VolumeEntry{
+				{Identifier: "disk7s1", Name: "EFI"},
+				{Identifier: "disk7s2", Name: "USB Backup Drive"},
+			},
+			want: "EFI, USB Backup Drive",
+		},
+		{
+			name:    "no named volumes",
+			volumes: []VolumeEntry{{Identifier: "disk5"}},
+			want:    "",
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if got := joinVolumeLabels(tt.volumes); got != tt.want {
+				t.Fatalf("joinVolumeLabels() = %q, want %q", got, tt.want)
+			}
+		})
 	}
 }

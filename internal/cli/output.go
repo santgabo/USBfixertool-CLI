@@ -31,16 +31,16 @@ func writeDiskList(w io.Writer, format string, disks []usbfix.DiskEntry) error {
 		return writeJSON(w, disks)
 	case "plain":
 		for _, disk := range disks {
-			if _, err := fmt.Fprintf(w, "%s\t%s\t%s\n", disk.Identifier, disk.DeviceLocation, disk.Size); err != nil {
+			if _, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", disk.Identifier, disk.DeviceLocation, disk.Size, firstText(disk.VolumeLabel, "-")); err != nil {
 				return err
 			}
 		}
 		return nil
 	default:
 		tw := tabwriter.NewWriter(w, 0, 4, 2, ' ', 0)
-		fmt.Fprintln(tw, "IDENTIFIER\tLOCATION\tREMOVABLE\tINTERNAL\tSIZE\tNAME")
+		fmt.Fprintln(tw, "IDENTIFIER\tLOCATION\tREMOVABLE\tINTERNAL\tSIZE\tNAME\tLABEL")
 		for _, disk := range disks {
-			fmt.Fprintf(tw, "%s\t%s\t%t\t%t\t%s\t%s\n", disk.Identifier, disk.DeviceLocation, disk.Removable, disk.Internal, disk.Size, firstText(disk.Name, "-"))
+			fmt.Fprintf(tw, "%s\t%s\t%t\t%t\t%s\t%s\t%s\n", disk.Identifier, disk.DeviceLocation, disk.Removable, disk.Internal, disk.Size, firstText(disk.Name, "-"), firstText(disk.VolumeLabel, "-"))
 		}
 		return tw.Flush()
 	}

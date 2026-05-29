@@ -52,11 +52,54 @@ func TestListDefaultFiltersInternalAndNonPortableDisks(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Execute returned error: %v\nstderr:\n%s", err, stderr)
 	}
-	if !strings.Contains(stdout, "disk4\tExternal\t31.0 GB") {
-		t.Fatalf("expected external disk in output:\n%s", stdout)
+	if !strings.Contains(stdout, "disk4\tExternal\t31.0 GB\tUSBBOOT") {
+		t.Fatalf("expected external disk with volume label in output:\n%s", stdout)
 	}
 	if strings.Contains(stdout, "disk0") || strings.Contains(stdout, "disk5") {
 		t.Fatalf("expected internal and non-portable disks to be filtered:\n%s", stdout)
+	}
+}
+
+func TestListTableIncludesVolumeLabel(t *testing.T) {
+	t.Parallel()
+
+	runner := &fakeRunner{responses: map[string]string{
+		"diskutil list":            diskutilListFixture(),
+		"diskutil info /dev/disk4": externalDiskInfo(),
+	}}
+
+	stdout, stderr, err := executeRoot(t, runner, "", "list")
+	if err != nil {
+		t.Fatalf("Execute returned error: %v\nstderr:\n%s", err, stderr)
+	}
+	for _, want := range []string{"LABEL", "USBBOOT", "IDENTIFIER", "NAME"} {
+		if !strings.Contains(stdout, want) {
+			t.Fatalf("expected %q in table output:\n%s", want, stdout)
+		}
+	}
+}
+
+func TestListJSONIncludesVolumeLabel(t *testing.T) {
+	t.Parallel()
+
+	runner := &fakeRunner{responses: map[string]string{
+		"diskutil list":            diskutilListFixture(),
+		"diskutil info /dev/disk4": externalDiskInfo(),
+	}}
+
+	stdout, stderr, err := executeRoot(t, runner, "", "--output", "json", "list")
+	if err != nil {
+		t.Fatalf("Execute returned error: %v\nstderr:\n%s", err, stderr)
+	}
+	var disks []usbfix.DiskEntry
+	if err := json.Unmarshal([]byte(stdout), &disks); err != nil {
+		t.Fatalf("invalid JSON output: %v\n%s", err, stdout)
+	}
+	if len(disks) != 1 {
+		t.Fatalf("got %d disks, want 1: %#v", len(disks), disks)
+	}
+	if disks[0].VolumeLabel != "USBBOOT" {
+		t.Fatalf("volumeLabel = %q, want USBBOOT", disks[0].VolumeLabel)
 	}
 }
 
