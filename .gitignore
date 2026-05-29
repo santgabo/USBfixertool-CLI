@@ -5,8 +5,9 @@ bin/
 /usbfix
 coverage.out
 dist/
-
 # Skill packaging and local eval runs
 *.skill
 *-workspace/
-
+**/*.local/
+.agents/skills/
+skills-lock.json

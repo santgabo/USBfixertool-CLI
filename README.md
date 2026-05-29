@@ -55,7 +55,7 @@ go install ./cmd/usbfix
 
 ## Agent Skills (AI)
 
-This repository publishes **`usbfix-cli-safety`**, an agent skill that teaches AI assistants to operate `usbfix` safely — including mandatory confirmation before touching internal disks.
+This repository publishes **`usbfix-cli`**, an agent skill that teaches AI assistants how to use `usbfix` — commands, workflows, output formats, scripting, and safety rules for destructive or internal disk operations.
 
 Install with [skills.sh](https://skills.sh):
 
@@ -63,14 +63,14 @@ Install with [skills.sh](https://skills.sh):
 # List available skills in this repo
 npx skills add santgabo/USBfixertool-CLI --list
 
-# Install for Cursor (project-local)
-npx skills add santgabo/USBfixertool-CLI --skill usbfix-cli-safety -a cursor -y
+# Install in the current project
+npx skills add santgabo/USBfixertool-CLI --skill usbfix-cli
 
 # Install globally (available in all projects)
-npx skills add santgabo/USBfixertool-CLI --skill usbfix-cli-safety -g -a cursor -y
+npx skills add santgabo/USBfixertool-CLI --skill usbfix-cli -g
 ```
 
-The skill source lives at [`skills/usbfix-cli-safety/SKILL.md`](skills/usbfix-cli-safety/SKILL.md). After installation, agents read it before running any `usbfix` command that could modify disks.
+The CLI detects your agent and prompts where to install. The skill source lives at [`skills/usbfix-cli/SKILL.md`](skills/usbfix-cli/SKILL.md).
 
 ---
 
